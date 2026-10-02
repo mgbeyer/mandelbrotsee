@@ -1,0 +1,2884 @@
+<!doctype html>
+
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Fraktallandschaften – C64 Live Renderer</title>
+
+<style>
+body {
+  background: #222;
+  color: #eee;
+  font: 14px system-ui;
+  margin: 24px;
+}
+
+/* ------------------------------------------------------------
+   Obere Steuerung
+   ------------------------------------------------------------ */
+
+.top-controls {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  max-width: 1260px;
+  margin-bottom: 20px;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  width: 980px;
+  max-width: 980px;
+}
+
+.control {
+  padding: 10px 12px;
+  border: 1px solid #555;
+  border-radius: 10px;
+  background: #2b2b2b;
+}
+
+.control-title {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.value {
+  font-family: monospace;
+  min-width: 70px;
+  text-align: right;
+}
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.slider-row input[type="range"] {
+  flex: 1;
+  min-width: 0;
+}
+
+.numeric-input {
+  width: 82px;
+  box-sizing: border-box;
+  padding: 4px 5px;
+  border: 1px solid #666;
+  border-radius: 4px;
+  background: #222;
+  color: #eee;
+  font: 13px monospace;
+  text-align: right;
+}
+
+.numeric-input:focus {
+  outline: 1px solid #aaa;
+  border-color: #aaa;
+}
+
+input[type="range"] {
+  width: 100%;
+}
+
+
+/* ------------------------------------------------------------
+   Windrose
+   ------------------------------------------------------------ */
+
+.compass-container {
+  padding: 8px;
+  border: 1px solid #555;
+  border-radius: 10px;
+  background: #2b2b2b;
+  width: 150px;
+  height: 150px;
+  flex: 0 0 150px;
+  box-sizing: border-box;
+}
+
+.compass-title {
+  color: #aaa;
+  font-size: 11px;
+  text-align: center;
+  margin-bottom: 2px;
+}
+
+#compass {
+  display: block;
+  width: 130px;
+  height: 130px;
+  margin: 0 auto;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.compass-ring {
+  fill: #222;
+  stroke: #666;
+  stroke-width: 1;
+}
+
+.compass-segment {
+  fill: #333;
+  stroke: #555;
+  stroke-width: 1;
+  cursor: pointer;
+}
+
+.compass-segment:hover {
+  fill: #444;
+}
+
+.compass-direction {
+  fill: #ddd;
+  font: 11px monospace;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+}
+
+.compass-arrow {
+  stroke: #fff;
+  stroke-width: 3;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+.compass-center {
+  fill: #fff;
+  pointer-events: none;
+}
+
+
+/* ------------------------------------------------------------
+   Hauptansicht
+   ------------------------------------------------------------ */
+
+.visuals {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+#canvas {
+  width: 960px;
+  height: 600px;
+  flex: 0 0 960px;
+  image-rendering: pixelated;
+  border: 1px solid #555;
+  background: #000;
+  display: block;
+}
+
+.navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 260px;
+  flex: 0 0 260px;
+  margin-top: 16px;
+}
+
+.map-container,
+.info {
+  padding: 10px;
+  border: 1px solid #555;
+  border-radius: 10px;
+  background: #2b2b2b;
+}
+
+#map {
+  display: block;
+  width: 240px;
+  height: 240px;
+  image-rendering: pixelated;
+  border: 1px solid #555;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 5px 12px;
+}
+
+.info-label {
+  color: #aaa;
+}
+
+.info-value {
+  font-family: monospace;
+  text-align: right;
+}
+
+.help {
+  color: #aaa;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: 10px;
+}
+
+#navigationModeButton {
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid #666;
+  border-radius: 5px;
+  background: #333;
+  color: #eee;
+  font: inherit;
+  cursor: pointer;
+}
+
+#navigationModeButton:hover {
+  background: #444;
+}
+
+#navigationModeButton:active {
+  background: #555;
+}
+
+
+/* ------------------------------------------------------------
+   Responsive
+   ------------------------------------------------------------ */
+
+@media (max-width: 1250px) {
+
+  .top-controls {
+    flex-wrap: wrap;
+  }
+
+  .controls {
+    width: 100%;
+    max-width: 980px;
+  }
+
+  #canvas {
+    width: 100%;
+    height: auto;
+    flex: 0 1 auto;
+    aspect-ratio: 8 / 5;
+  }
+}
+
+@media (max-width: 700px) {
+
+  .controls {
+    grid-template-columns: 1fr;
+  }
+
+  .top-controls {
+    flex-direction: column;
+  }
+
+  .compass-container {
+    align-self: center;
+  }
+
+  .visuals {
+    flex-direction: column;
+  }
+
+  #canvas {
+    width: 100%;
+    flex: 0 1 auto;
+  }
+
+  .navigation {
+    width: 100%;
+    flex: 0 1 auto;
+  }
+
+  #map {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+  }
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="top-controls">
+
+  <div class="controls">
+
+<div class="control">
+
+  <div class="control-title">
+    <span>X</span>
+    <span id="xValue" class="value">0.000</span>
+  </div>
+
+  <div class="slider-row">
+
+    <input id="xSlider"
+           type="range"
+           min="-2"
+           max="2"
+           step="0.001"
+           value="0">
+
+    <input id="xInput"
+           class="numeric-input"
+           type="number"
+           min="-2"
+           max="2"
+           step="0.001"
+           value="0">
+
+  </div>
+
+</div>
+
+
+<div class="control">
+
+  <div class="control-title">
+    <span>Y</span>
+    <span id="yValue" class="value">0.000</span>
+  </div>
+
+  <div class="slider-row">
+
+    <input id="ySlider"
+           type="range"
+           min="-2"
+           max="2"
+           step="0.001"
+           value="0">
+
+    <input id="yInput"
+           class="numeric-input"
+           type="number"
+           min="-2"
+           max="2"
+           step="0.001"
+           value="0">
+
+  </div>
+
+</div>
+
+
+<div class="control">
+
+  <div class="control-title">
+    <span>Blickrichtung</span>
+    <span id="directionValue" class="value">0°</span>
+  </div>
+
+  <div class="slider-row">
+
+    <input id="directionSlider"
+           type="range"
+           min="0"
+           max="359"
+           step="1"
+           value="0">
+
+    <input id="directionInput"
+           class="numeric-input"
+           type="number"
+           min="0"
+           max="359"
+           step="1"
+           value="0">
+
+  </div>
+
+</div>
+
+
+<div class="control">
+
+  <div class="control-title">
+    <span>Höhe</span>
+    <span id="heightValueTop" class="value">1.00</span>
+  </div>
+
+  <div class="slider-row">
+
+    <input id="heightSlider"
+           type="range"
+           min="0.05"
+           max="10"
+           step="0.01"
+           value="1">
+
+    <input id="heightInput"
+           class="numeric-input"
+           type="number"
+           min="0.05"
+           max="10"
+           step="0.01"
+           value="1">
+
+  </div>
+
+</div>
+
+  </div>
+
+  <div class="compass-container">
+
+<div class="compass-title">
+  Blickrichtung
+</div>
+
+<svg id="compass"
+     viewBox="0 0 180 180"
+     aria-label="Windrose">
+
+  <circle
+    class="compass-ring"
+    cx="90"
+    cy="90"
+    r="78">
+  </circle>
+
+  <g id="compassSegments"></g>
+
+  <!--
+       Die Gradangaben folgen exakt der 2D-Karte:
+       0°   = unten
+       45°  = unten rechts
+       90°  = rechts
+       135° = oben rechts
+       180° = oben
+       225° = oben links
+       270° = links
+       315° = unten links
+  -->
+
+  <text class="compass-direction"
+        x="90"
+        y="166">0°</text>
+
+  <text class="compass-direction"
+        x="144"
+        y="144">45°</text>
+
+  <text class="compass-direction"
+        x="166"
+        y="90">90°</text>
+
+  <text class="compass-direction"
+        x="144"
+        y="36">135°</text>
+
+  <text class="compass-direction"
+        x="90"
+        y="14">180°</text>
+
+  <text class="compass-direction"
+        x="36"
+        y="36">225°</text>
+
+  <text class="compass-direction"
+        x="14"
+        y="90">270°</text>
+
+  <text class="compass-direction"
+        x="36"
+        y="144">315°</text>
+
+  <line id="compassArrow"
+        class="compass-arrow"
+        x1="90"
+        y1="90"
+        x2="90"
+        y2="28">
+  </line>
+
+  <circle
+    class="compass-center"
+    cx="90"
+    cy="90"
+    r="4">
+  </circle>
+
+</svg>
+
+  </div>
+
+</div>
+
+
+<div class="visuals">
+
+<canvas id="canvas"
+       width="320"
+       height="200"> </canvas>
+
+  <div class="navigation">
+
+<div class="map-container">
+
+  <canvas id="map"
+          width="240"
+          height="240">
+  </canvas>
+
+  <div class="help">
+    Marker ziehen = Position<br>
+    Kreisgriff = Blickrichtung<br>
+    Höhenpunkt = Höhe
+  </div>
+
+</div>
+
+
+<div class="info">
+
+  <div class="info-grid">
+
+    <div class="info-label">X</div>
+    <div id="ix" class="info-value">0.000</div>
+
+    <div class="info-label">Y</div>
+    <div id="iy" class="info-value">0.000</div>
+
+    <div class="info-label">Blickrichtung</div>
+    <div id="id" class="info-value">0°</div>
+
+    <div class="info-label">Höhe</div>
+    <div id="ih" class="info-value">1.00</div>
+
+    <div class="info-label">Steuerung</div>
+
+    <div class="info-value">
+
+      <button id="navigationModeButton"
+              type="button">
+
+        <span id="in">
+          Karte
+        </span>
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+  </div>
+
+</div>
+
+<script>
+const DEFAULT_VIEW = {
+  x: -1,
+  y: 0,
+  direction: 90,
+  height: 5,
+  navigationMode: 'direction'	// map | direction
+};
+
+const canvas =
+  document.getElementById('canvas');
+
+const ctx =
+  canvas.getContext('2d');
+
+const map =
+  document.getElementById('map');
+
+const mapCtx =
+  map.getContext('2d');
+
+const compass =
+  document.getElementById('compass');
+
+const compassArrow =
+  document.getElementById('compassArrow');
+
+const compassSegments =
+  document.getElementById('compassSegments');
+
+
+const COLOR = {
+  black: 	 '#000000',
+  red:   	 '#813338',
+  green: 	 '#6aaa3a',
+  blue:  	 '#352879',
+  lightblue: '#6558A9',
+  white: 	 '#FFFFFF'
+};
+
+const SKY_CONFIG = {
+
+  theme: 'stripes',
+
+  stripes: {
+    color: COLOR.lightblue,
+
+    /* Anzahl der Streifen im Himmel */
+    count: 16,
+
+    /* Dicke eines Streifens in Pixeln */
+    thickness: 1,
+
+    /* Stärke der Verdichtung zum Horizont */
+    compression: 2.0
+  }
+
+};
+
+const WIDTH = 320;
+const HEIGHT = 200;
+
+const MAP_W = 240;
+const MAP_H = 240;
+
+const WORLD_MIN = -2;
+const WORLD_MAX = 2;
+
+const MIN_HEIGHT = 0.05;
+const MAX_HEIGHT = 10;
+
+
+const RENDER_CONFIG = {
+  viewWidthScale: 0.0093,		// horizontale Breite des Sichtfelds, Größerer Wert → breiteres Sichtfeld, Kleinerer Wert → engeres Sichtfeld / stärkere Vergrößerung
+  iterationHeightChange: 0.05	// Höhenveränderung pro Iteration, Größerer Wert → stärkeres Absteigen, Kleinerer Wert → schwächeres Absteigen
+};
+
+
+const sliders = {
+  x: document.getElementById('xSlider'),
+  y: document.getElementById('ySlider'),
+  d: document.getElementById('directionSlider'),
+  h: document.getElementById('heightSlider')
+};
+
+
+const inputs = {
+  x: document.getElementById('xInput'),
+  y: document.getElementById('yInput'),
+  d: document.getElementById('directionInput'),
+  h: document.getElementById('heightInput')
+};
+
+const xValue =
+  document.getElementById('xValue');
+
+const yValue =
+  document.getElementById('yValue');
+
+const directionValue =
+  document.getElementById('directionValue');
+
+const heightValueTop =
+  document.getElementById('heightValueTop');
+
+
+const info = {
+  x: document.getElementById('ix'),
+  y: document.getElementById('iy'),
+  d: document.getElementById('id'),
+  h: document.getElementById('ih'),
+  navigation:
+    document.getElementById('in')
+};
+
+
+const navigationModeButton =
+  document.getElementById(
+    'navigationModeButton'
+  );
+
+
+/* ============================================================
+   DEFAULT VALUES INITIALIZER
+   ============================================================ */
+
+function setDefaultView() {
+
+  sliders.x.value =
+    DEFAULT_VIEW.x;
+
+  sliders.y.value =
+    DEFAULT_VIEW.y;
+
+  sliders.d.value =
+    DEFAULT_VIEW.direction;
+
+  sliders.h.value =
+    DEFAULT_VIEW.height;
+	
+  navigationMode =
+    DEFAULT_VIEW.navigationMode;
+}
+
+/* ============================================================
+   FRAKTAL
+   ============================================================ */
+
+function iterate(xc, yc) {
+
+  let xa = 0;
+  let ya = 0;
+  let z = 2;
+
+  while (true) {
+
+    const x2 =
+      Math.abs(xa);
+
+    const y2 =
+      Math.abs(ya);
+
+    const xn =
+      x2 - y2 - xc;
+
+    ya =
+      xa * ya;
+
+    ya =
+      ya + ya - yc;
+
+    xa =
+      xn;
+
+    z -= RENDER_CONFIG.iterationHeightChange;
+
+    if (
+      z < 0 ||
+      x2 + y2 > 400
+    ) {
+      return { z };
+    }
+  }
+}
+
+
+function minimumHeight(x, y) {
+  return iterate(x, y).z;
+}
+
+
+/* ============================================================
+   ZEICHENHILFEN
+   ============================================================ */
+
+function clearScreen() {
+
+  ctx.fillStyle =
+    COLOR.blue;
+
+  ctx.fillRect(
+    0,
+    0,
+    WIDTH,
+    HEIGHT
+  );
+}
+
+
+function plotPixel(x, y, color) {
+
+  if (
+    x < 0 ||
+    x >= WIDTH ||
+    y < 0 ||
+    y >= HEIGHT
+  ) {
+    return;
+  }
+
+  ctx.fillStyle =
+    color;
+
+  ctx.fillRect(
+    Math.round(x),
+    Math.round(y),
+    1,
+    1
+  );
+}
+
+
+function verticalLine(
+  x,
+  y1,
+  y2,
+  color
+) {
+
+  x = Math.round(x);
+  y1 = Math.round(y1);
+  y2 = Math.round(y2);
+
+  if (
+    x < 0 ||
+    x >= WIDTH
+  ) {
+    return;
+  }
+
+  if (y1 > y2) {
+
+    const t = y1;
+
+    y1 = y2;
+    y2 = t;
+  }
+
+  y1 =
+    Math.max(
+      0,
+      y1
+    );
+
+  y2 =
+    Math.min(
+      HEIGHT - 1,
+      y2
+    );
+
+  if (y2 < y1) {
+    return;
+  }
+
+  ctx.fillStyle =
+    color;
+
+  ctx.fillRect(
+    x,
+    y1,
+    1,
+    y2 - y1 + 1
+  );
+}
+
+
+/* ============================================================
+   HAUPTANSICHT
+   ============================================================ */
+
+function drawSky() {
+
+  const theme =
+    SKY_CONFIG.theme;
+
+  if (theme === 'stripes') {
+    drawStripeSky(
+      SKY_CONFIG.stripes
+    );
+  }
+}
+
+function drawStripeSky(config) {
+
+  const horizon = 100;
+
+  /*
+     Grundfarbe des Himmels
+  */
+
+  ctx.fillStyle =
+    COLOR.blue;
+
+  ctx.fillRect(
+    0,
+    0,
+    WIDTH,
+    horizon
+  );
+
+
+  /*
+     Streifenpositionen.
+
+     t = 0  -> oben
+     t = 1  -> Horizont
+
+     Durch die Potenz werden die Streifen
+     zum Horizont hin dichter.
+  */
+
+  for (
+    let i = 0;
+    i < config.count;
+    i++
+  ) {
+
+    const t =
+      i / (config.count - 1);
+
+	const position =
+	  1 - Math.pow(
+		1 - t,
+		config.compression
+	  );
+  
+    const y =
+      position * horizon;
+
+
+    ctx.fillStyle =
+      config.color;
+
+    ctx.fillRect(
+      0,
+      Math.round(y),
+      WIDTH,
+      config.thickness
+    );
+  }
+}
+
+function render(
+  x1,
+  y1,
+  eyeHeight,
+  bearingDegrees
+) {
+
+  const first =
+    iterate(x1, y1);
+
+  if (
+    eyeHeight <
+    first.z
+  ) {
+
+    clearScreen();
+
+    return false;
+  }
+
+
+  const angle =
+    bearingDegrees *
+    Math.PI / 180;
+
+  const si =
+    Math.sin(angle);
+
+  const co =
+    Math.cos(angle);
+
+
+  drawSky();
+
+
+  let previousZ = 0;
+  let previousC = 0;
+
+
+  for (
+    let v = 1;
+    v <= 600;
+    v += 2
+  ) {
+
+    const e =
+      eyeHeight /
+      v *
+      10;
+
+
+    for (
+      let ho = -160;
+      ho < 160;
+      ho++
+    ) {
+
+      const hc =
+        -e * ho * RENDER_CONFIG.viewWidthScale;
+
+      const xc =
+        x1 +
+        hc * co +
+        e * si;
+
+      const yc =
+        y1 -
+        hc * si +
+        e * co;
+
+
+      const raw =
+        iterate(xc, yc).z;
+
+      const isWater =
+        raw < 0;
+
+      const surfaceColor =
+        isWater ? 0 : 3;
+
+
+      let z =
+        previousZ * 0.7 +
+        raw * 0.3;
+
+
+      if (isWater) {
+        z = -1e-4;
+      }
+
+
+      let c =
+        (z - eyeHeight) *
+        v /
+        eyeHeight;
+
+
+      if (
+        Math.abs(c) > 98
+      ) {
+
+        c =
+          98 *
+          Math.sign(c);
+      }
+
+
+      verticalLine(
+        160 + ho,
+        98 - c,
+        199,
+        COLOR.white
+      );
+
+
+      verticalLine(
+        159 + ho,
+        99 - c,
+        199,
+        COLOR.red
+      );
+
+
+      if (c < 0) {
+
+        plotPixel(
+          159 + ho,
+          99 - c,
+          surfaceColor === 0
+            ? COLOR.blue
+            : COLOR.green
+        );
+      }
+
+
+      if (
+        c >
+        previousC + 0.2
+      ) {
+
+        verticalLine(
+          159 + ho,
+          99 - c,
+          99 - previousC,
+          COLOR.black
+        );
+      }
+
+
+      plotPixel(
+        159 + ho,
+        98 - c,
+        surfaceColor === 0
+          ? COLOR.blue
+          : COLOR.green
+      );
+
+
+      previousC = c;
+      previousZ = z;
+    }
+  }
+
+  return true;
+}
+
+
+/* ============================================================
+   KARTE
+   ============================================================ */
+
+function worldToMap(x, y) {
+
+  return {
+
+    x:
+      (x - WORLD_MIN) /
+      (WORLD_MAX - WORLD_MIN) *
+      MAP_W,
+
+    y:
+      (y - WORLD_MIN) /
+      (WORLD_MAX - WORLD_MIN) *
+      MAP_H
+  };
+}
+
+
+function mapToWorld(px, py) {
+
+  return {
+
+    x:
+      WORLD_MIN +
+      px / MAP_W *
+      (WORLD_MAX - WORLD_MIN),
+
+    y:
+      WORLD_MIN +
+      py / MAP_H *
+      (WORLD_MAX - WORLD_MIN)
+  };
+}
+
+
+function getMarkerPosition() {
+
+  return worldToMap(
+    +sliders.x.value,
+    +sliders.y.value
+  );
+}
+
+
+/* ============================================================
+   KARTENMARKER
+   ============================================================ */
+
+function drawMapMarker() {
+
+  const p =
+    getMarkerPosition();
+
+  const direction =
+    +sliders.d.value;
+
+  const angle =
+    direction *
+    Math.PI / 180;
+
+  const dx =
+    Math.sin(angle);
+
+  const dy =
+    Math.cos(angle);
+
+
+  /* Positionsmarker */
+
+  mapCtx.fillStyle =
+    '#000000';
+
+  mapCtx.beginPath();
+
+  mapCtx.arc(
+    p.x,
+    p.y,
+    7,
+    0,
+    Math.PI * 2
+  );
+
+  mapCtx.fill();
+
+  mapCtx.strokeStyle =
+    '#ffffff';
+
+  mapCtx.lineWidth = 2;
+
+  mapCtx.stroke();
+
+
+  /* Blickrichtung */
+
+  const directionLength =
+    32;
+
+  const handleX =
+    p.x +
+    dx *
+    directionLength;
+
+  const handleY =
+    p.y +
+    dy *
+    directionLength;
+
+
+  mapCtx.strokeStyle =
+    '#ffffff';
+
+  mapCtx.lineWidth = 2;
+
+  mapCtx.beginPath();
+
+  mapCtx.moveTo(
+    p.x,
+    p.y
+  );
+
+  mapCtx.lineTo(
+    handleX,
+    handleY
+  );
+
+  mapCtx.stroke();
+
+
+  /* Richtungsgriff */
+
+  mapCtx.fillStyle =
+    '#ffffff';
+
+  mapCtx.beginPath();
+
+  mapCtx.arc(
+    handleX,
+    handleY,
+    6,
+    0,
+    Math.PI * 2
+  );
+
+  mapCtx.fill();
+
+  mapCtx.strokeStyle =
+    '#000000';
+
+  mapCtx.lineWidth = 1;
+
+  mapCtx.stroke();
+
+
+  /* Höhenregler */
+
+  const height =
+    +sliders.h.value;
+
+  const heightBaseX =
+    p.x + 20;
+
+  const heightBaseY =
+    p.y;
+
+  const heightMaxLength =
+    52;
+
+
+  const heightRatio =
+    (height - MIN_HEIGHT) /
+    (MAX_HEIGHT - MIN_HEIGHT);
+
+  const heightLength =
+    heightRatio *
+    heightMaxLength;
+
+
+  /* Höhenbalken */
+
+  if (heightLength > 1) {
+
+    mapCtx.strokeStyle =
+      '#ffffff';
+
+    mapCtx.lineWidth = 3;
+
+    mapCtx.beginPath();
+
+    mapCtx.moveTo(
+      heightBaseX,
+      heightBaseY
+    );
+
+    mapCtx.lineTo(
+      heightBaseX,
+      heightBaseY -
+      heightLength
+    );
+
+    mapCtx.stroke();
+  }
+
+
+  /* Ganzzahl-Markierungen */
+
+  mapCtx.lineWidth = 1;
+
+  for (
+    let mark = 1;
+    mark <= 10;
+    mark++
+  ) {
+
+    const markRatio =
+      (mark - MIN_HEIGHT) /
+      (MAX_HEIGHT - MIN_HEIGHT);
+
+    const markY =
+      heightBaseY -
+      markRatio *
+      heightMaxLength;
+
+
+    if (
+      markY >=
+        heightBaseY -
+        heightLength -
+        2 &&
+      markY <=
+        heightBaseY
+    ) {
+
+      mapCtx.strokeStyle =
+        '#ffffff';
+
+      mapCtx.beginPath();
+
+      mapCtx.moveTo(
+        heightBaseX - 6,
+        markY
+      );
+
+      mapCtx.lineTo(
+        heightBaseX + 6,
+        markY
+      );
+
+      mapCtx.stroke();
+    }
+  }
+
+
+  /* Höhen-Griff */
+
+  const heightHandleY =
+    heightBaseY -
+    heightLength;
+
+  mapCtx.fillStyle =
+    '#ffffff';
+
+  mapCtx.beginPath();
+
+  mapCtx.arc(
+    heightBaseX,
+    heightHandleY,
+    6,
+    0,
+    Math.PI * 2
+  );
+
+  mapCtx.fill();
+
+  mapCtx.strokeStyle =
+    '#000000';
+
+  mapCtx.lineWidth = 1;
+
+  mapCtx.stroke();
+}
+
+
+/* ============================================================
+   KARTE ZEICHNEN
+   ============================================================ */
+
+function drawMap() {
+
+  const cells = 80;
+
+  const cellW =
+    MAP_W / cells;
+
+  const cellH =
+    MAP_H / cells;
+
+
+  mapCtx.clearRect(
+    0,
+    0,
+    MAP_W,
+    MAP_H
+  );
+
+
+  for (
+    let gy = 0;
+    gy < cells;
+    gy++
+  ) {
+
+    for (
+      let gx = 0;
+      gx < cells;
+      gx++
+    ) {
+
+      const x =
+        WORLD_MIN +
+        (gx + 0.5) /
+        cells *
+        (WORLD_MAX - WORLD_MIN);
+
+      const y =
+        WORLD_MIN +
+        (gy + 0.5) /
+        cells *
+        (WORLD_MAX - WORLD_MIN);
+
+
+      const raw =
+        iterate(x, y).z;
+
+
+      mapCtx.fillStyle =
+        raw < 0
+          ? COLOR.blue
+          : COLOR.green;
+
+
+      mapCtx.fillRect(
+        gx * cellW,
+        gy * cellH,
+        Math.ceil(cellW),
+        Math.ceil(cellH)
+      );
+    }
+  }
+
+
+  drawMapMarker();
+}
+
+
+/* ============================================================
+   GRAD-WINDROSE
+   ============================================================ */
+
+const COMPASS_DIRECTIONS = [
+  0,
+  45,
+  90,
+  135,
+  180,
+  225,
+  270,
+  315
+];
+
+
+/*
+   Die Windrose verwendet exakt dieselbe
+   Bildschirm-/Kartenrichtung wie der Marker:
+
+   0°   = unten
+   45°  = unten rechts
+   90°  = rechts
+   135° = oben rechts
+   180° = oben
+   225° = oben links
+   270° = links
+   315° = unten links
+
+   Deshalb ist Y hier +cos() und nicht -cos().
+*/
+
+function compassPoint(
+  angle,
+  radius
+) {
+
+  const rad =
+    angle *
+    Math.PI /
+    180;
+
+  return {
+
+    x:
+      90 +
+      Math.sin(rad) *
+      radius,
+
+    y:
+      90 +
+      Math.cos(rad) *
+      radius
+  };
+}
+
+
+function createCompassSegments() {
+
+  COMPASS_DIRECTIONS.forEach(
+    direction => {
+
+      const startAngle =
+        direction - 22.5;
+
+      const endAngle =
+        direction + 22.5;
+
+
+      const p1 =
+        compassPoint(
+          startAngle,
+          72
+        );
+
+      const p2 =
+        compassPoint(
+          endAngle,
+          72
+        );
+
+      const p3 =
+        compassPoint(
+          endAngle,
+          43
+        );
+
+      const p4 =
+        compassPoint(
+          startAngle,
+          43
+        );
+
+
+      const polygon =
+        document.createElementNS(
+          'http://www.w3.org/2000/svg',
+          'polygon'
+        );
+
+
+      polygon.setAttribute(
+        'points',
+        `${p1.x},${p1.y}
+         ${p2.x},${p2.y}
+         ${p3.x},${p3.y}
+         ${p4.x},${p4.y}`
+      );
+
+
+      polygon.classList.add(
+        'compass-segment'
+      );
+
+
+      polygon.dataset.angle =
+        direction;
+
+
+      polygon.setAttribute(
+        'aria-label',
+        `${direction}°`
+      );
+
+
+      polygon.addEventListener(
+        'click',
+        () => {
+
+          sliders.d.value =
+            direction;
+
+          update();
+        }
+      );
+
+
+      compassSegments.appendChild(
+        polygon
+      );
+    }
+  );
+}
+
+
+function updateCompass() {
+
+  const direction =
+    +sliders.d.value;
+
+
+  const point =
+    compassPoint(
+      direction,
+      60
+    );
+
+
+  compassArrow.setAttribute(
+    'x2',
+    point.x
+  );
+
+  compassArrow.setAttribute(
+    'y2',
+    point.y
+  );
+}
+
+
+/* ============================================================
+   SYNCHRONISATION
+   ============================================================ */
+
+function update() {
+
+  const x =
+    +sliders.x.value;
+
+  const y =
+    +sliders.y.value;
+
+  const d =
+    +sliders.d.value;
+
+  const h =
+    +sliders.h.value;
+
+
+  xValue.textContent =
+    x.toFixed(3);
+
+  yValue.textContent =
+    y.toFixed(3);
+
+  directionValue.textContent =
+    `${d}°`;
+
+  heightValueTop.textContent =
+    h.toFixed(2);
+
+
+  if (
+    document.activeElement !==
+    inputs.x
+  ) {
+    inputs.x.value =
+      x.toFixed(3);
+  }
+
+  if (
+    document.activeElement !==
+    inputs.y
+  ) {
+    inputs.y.value =
+      y.toFixed(3);
+  }
+
+  if (
+    document.activeElement !==
+    inputs.d
+  ) {
+    inputs.d.value =
+      d;
+  }
+
+  if (
+    document.activeElement !==
+    inputs.h
+  ) {
+    inputs.h.value =
+      h.toFixed(2);
+  }
+
+
+  info.x.textContent =
+    x.toFixed(3);
+
+  info.y.textContent =
+    y.toFixed(3);
+
+  info.d.textContent =
+    `${d}°`;
+
+  info.h.textContent =
+    h.toFixed(2);
+
+
+  info.navigation.textContent =
+    navigationMode === 'map'
+      ? 'Karte'
+      : 'Blickrichtung';
+
+
+  drawMap();
+
+  updateCompass();
+
+  render(
+    x,
+    y,
+    h,
+    d
+  );
+}
+
+
+/* ============================================================
+   NUMERISCHE EINGABEN
+   ============================================================ */
+
+function commitNumericInput(
+  input,
+  slider
+) {
+
+  let value =
+    parseFloat(input.value);
+
+
+  if (!Number.isFinite(value)) {
+
+    update();
+
+    return;
+  }
+
+
+  const min =
+    parseFloat(slider.min);
+
+  const max =
+    parseFloat(slider.max);
+
+
+  value =
+    Math.max(
+      min,
+      Math.min(
+        max,
+        value
+      )
+    );
+
+
+  if (slider === sliders.d) {
+
+    value =
+      Math.round(value) % 360;
+
+    if (value < 0) {
+      value += 360;
+    }
+  }
+
+
+  slider.value =
+    value;
+
+
+  update();
+}
+
+
+Object.entries(inputs).forEach(
+  ([key, input]) => {
+
+    input.addEventListener(
+      'keydown',
+      event => {
+
+        if (
+          event.key === 'Enter'
+        ) {
+
+          event.preventDefault();
+
+          commitNumericInput(
+            input,
+            sliders[key]
+          );
+
+          input.blur();
+        }
+      }
+    );
+
+
+    input.addEventListener(
+      'blur',
+      () => {
+
+        commitNumericInput(
+          input,
+          sliders[key]
+        );
+      }
+    );
+  }
+);
+
+
+/* ============================================================
+   SLIDER
+   ============================================================ */
+
+sliders.x.addEventListener(
+  'input',
+  update
+);
+
+sliders.y.addEventListener(
+  'input',
+  update
+);
+
+sliders.d.addEventListener(
+  'input',
+  update
+);
+
+sliders.h.addEventListener(
+  'input',
+  update
+);
+
+
+/* ============================================================
+   KARTENINTERAKTION
+   ============================================================ */
+
+let mapDragging = false;
+let rotating = false;
+let changingHeight = false;
+
+let dragStartMouseY = 0;
+let dragStartHeight = 1;
+
+
+function getMapCoordinates(event) {
+
+  const rect =
+    map.getBoundingClientRect();
+
+  return {
+
+    x:
+      (event.clientX -
+       rect.left) *
+      MAP_W /
+      rect.width,
+
+    y:
+      (event.clientY -
+       rect.top) *
+      MAP_H /
+      rect.height
+  };
+}
+
+
+function distanceSquared(
+  x1,
+  y1,
+  x2,
+  y2
+) {
+
+  const dx =
+    x1 - x2;
+
+  const dy =
+    y1 - y2;
+
+  return (
+    dx * dx +
+    dy * dy
+  );
+}
+
+
+function isOnHeightHandle(
+  mx,
+  my
+) {
+
+  const p =
+    getMarkerPosition();
+
+  const height =
+    +sliders.h.value;
+
+
+  const ratio =
+    (height - MIN_HEIGHT) /
+    (MAX_HEIGHT - MIN_HEIGHT);
+
+
+  const heightLength =
+    ratio * 52;
+
+
+  const hx =
+    p.x + 20;
+
+  const hy =
+    p.y -
+    heightLength;
+
+
+  return (
+    distanceSquared(
+      mx,
+      my,
+      hx,
+      hy
+    ) < 14 * 14
+  );
+}
+
+
+function isOnDirectionHandle(
+  mx,
+  my
+) {
+
+  const p =
+    getMarkerPosition();
+
+  const direction =
+    +sliders.d.value;
+
+
+  const angle =
+    direction *
+    Math.PI /
+    180;
+
+
+  const dx =
+    Math.sin(angle);
+
+  const dy =
+    Math.cos(angle);
+
+
+  const hx =
+    p.x +
+    dx * 32;
+
+  const hy =
+    p.y +
+    dy * 32;
+
+
+  return (
+    distanceSquared(
+      mx,
+      my,
+      hx,
+      hy
+    ) < 14 * 14
+  );
+}
+
+
+function isOnMarker(
+  mx,
+  my
+) {
+
+  const p =
+    getMarkerPosition();
+
+  return (
+    distanceSquared(
+      mx,
+      my,
+      p.x,
+      p.y
+    ) < 12 * 12
+  );
+}
+
+
+/* ============================================================
+   POINTER DOWN
+   ============================================================ */
+
+map.addEventListener(
+  'pointerdown',
+  event => {
+
+    const p =
+      getMapCoordinates(event);
+
+
+    if (
+      isOnHeightHandle(
+        p.x,
+        p.y
+      )
+    ) {
+
+      changingHeight = true;
+
+      dragStartMouseY =
+        event.clientY;
+
+      dragStartHeight =
+        +sliders.h.value;
+
+
+      map.setPointerCapture(
+        event.pointerId
+      );
+
+      event.preventDefault();
+
+      return;
+    }
+
+
+    if (
+      isOnDirectionHandle(
+        p.x,
+        p.y
+      )
+    ) {
+
+      rotating = true;
+
+      map.setPointerCapture(
+        event.pointerId
+      );
+
+      event.preventDefault();
+
+      return;
+    }
+
+
+    if (
+      isOnMarker(
+        p.x,
+        p.y
+      )
+    ) {
+
+      mapDragging = true;
+
+      map.setPointerCapture(
+        event.pointerId
+      );
+
+      event.preventDefault();
+
+      return;
+    }
+
+
+    const world =
+      mapToWorld(
+        p.x,
+        p.y
+      );
+
+
+    sliders.x.value =
+      Math.max(
+        -2,
+        Math.min(
+          2,
+          world.x
+        )
+      );
+
+
+    sliders.y.value =
+      Math.max(
+        -2,
+        Math.min(
+          2,
+          world.y
+        )
+      );
+
+
+    update();
+  }
+);
+
+
+/* ============================================================
+   POINTER MOVE
+   ============================================================ */
+
+map.addEventListener(
+  'pointermove',
+  event => {
+
+    if (
+      !mapDragging &&
+      !rotating &&
+      !changingHeight
+    ) {
+      return;
+    }
+
+
+    const p =
+      getMapCoordinates(event);
+
+
+    if (changingHeight) {
+
+      const rect =
+        map.getBoundingClientRect();
+
+
+      const pixelScale =
+        MAP_H /
+        rect.height;
+
+
+      const mouseDeltaY =
+        (
+          event.clientY -
+          dragStartMouseY
+        ) *
+        pixelScale;
+
+
+      const heightPerPixel =
+        (
+          MAX_HEIGHT -
+          MIN_HEIGHT
+        ) / 52;
+
+
+      const newHeight =
+        dragStartHeight -
+        mouseDeltaY *
+        heightPerPixel;
+
+
+      sliders.h.value =
+        Math.max(
+          MIN_HEIGHT,
+          Math.min(
+            MAX_HEIGHT,
+            newHeight
+          )
+        );
+
+
+      update();
+
+      event.preventDefault();
+
+      return;
+    }
+
+
+    if (rotating) {
+
+      const marker =
+        getMarkerPosition();
+
+
+      let angle =
+        Math.atan2(
+          p.x - marker.x,
+          p.y - marker.y
+        ) *
+        180 /
+        Math.PI;
+
+
+      if (angle < 0) {
+        angle += 360;
+      }
+
+
+      sliders.d.value =
+        Math.round(angle) %
+        360;
+
+
+      update();
+
+      event.preventDefault();
+
+      return;
+    }
+
+
+    if (mapDragging) {
+
+      const world =
+        mapToWorld(
+          p.x,
+          p.y
+        );
+
+
+      sliders.x.value =
+        Math.max(
+          -2,
+          Math.min(
+            2,
+            world.x
+          )
+        );
+
+
+      sliders.y.value =
+        Math.max(
+          -2,
+          Math.min(
+            2,
+            world.y
+          )
+        );
+
+
+      update();
+
+      event.preventDefault();
+    }
+  }
+);
+
+
+/* ============================================================
+   POINTER UP / CANCEL
+   ============================================================ */
+
+function stopMapInteraction(
+  event
+) {
+
+  mapDragging = false;
+  rotating = false;
+  changingHeight = false;
+
+
+  try {
+
+    map.releasePointerCapture(
+      event.pointerId
+    );
+
+  } catch (_) {
+    /* Pointer Capture eventuell bereits verloren */
+  }
+}
+
+
+map.addEventListener(
+  'pointerup',
+  stopMapInteraction
+);
+
+map.addEventListener(
+  'pointercancel',
+  stopMapInteraction
+);
+
+
+/* ============================================================
+   TASTATUR-NAVIGATION
+   ============================================================ */
+
+const NAVIGATION = {
+
+  /* Weltkoordinaten pro Sekunde */
+  positionSpeed: 0.6,
+
+  /* Höhe pro Sekunde */
+  heightSpeed: 3.0,
+
+  /* Grad pro Sekunde */
+  directionSpeed: 180
+};
+
+
+let navigationMode =
+  DEFAULT_VIEW.navigationMode;
+
+/* ============================================================
+   STEUERMODUS
+   ============================================================ */
+
+function toggleNavigationMode() {
+
+  navigationMode =
+    navigationMode === 'map'
+      ? 'direction'
+      : 'map';
+
+  update();
+}
+
+
+navigationModeButton.addEventListener(
+  'click',
+  toggleNavigationMode
+);
+
+
+/* ============================================================
+   GEDRÜCKTE TASTEN
+   ============================================================ */
+
+const navigationKeys =
+  new Set();
+
+
+/*
+   Zeitpunkt des letzten Animationsschritts.
+*/
+
+let navigationTime =
+  performance.now();
+
+
+/* ============================================================
+   TASTATUR – DOWN
+   ============================================================ */
+
+document.addEventListener(
+  'keydown',
+  event => {
+
+    /*
+       Eingabefelder behalten ihre normale
+       Tastatursteuerung.
+    */
+
+    if (
+      event.target.tagName ===
+      'INPUT'
+    ) {
+      return;
+    }
+
+
+    /*
+       M – Steuermodus umschalten.
+
+       M wird bewusst nicht in navigationKeys
+       aufgenommen, da es nur einmal reagieren soll.
+    */
+
+    if (
+      event.key.toLowerCase() === 'm' &&
+      !event.ctrlKey &&
+      !event.altKey &&
+      !event.metaKey
+    ) {
+
+      toggleNavigationMode();
+
+      return;
+    }
+
+
+    /*
+       Home – Position zurücksetzen.
+
+       Auch Home ist eine einmalige Aktion.
+    */
+
+    if (
+      event.key === 'Home'
+    ) {
+
+      event.preventDefault();
+
+      setDefaultView();
+
+      update();
+
+      return;
+    }
+
+
+    /*
+       Nur die vier Pfeiltasten interessieren
+       uns für die kontinuierliche Navigation.
+    */
+
+    if (
+      event.key !== 'ArrowUp' &&
+      event.key !== 'ArrowDown' &&
+      event.key !== 'ArrowLeft' &&
+      event.key !== 'ArrowRight'
+    ) {
+      return;
+    }
+
+
+    /*
+       Pfeiltaste als gedrückt merken.
+
+       Set verhindert automatisch,
+       dass dieselbe Taste mehrfach eingetragen wird.
+    */
+
+    navigationKeys.add(
+      event.key
+    );
+
+
+    event.preventDefault();
+  }
+);
+
+
+/* ============================================================
+   TASTATUR – UP
+   ============================================================ */
+
+document.addEventListener(
+  'keyup',
+  event => {
+
+    if (
+      event.key === 'ArrowUp' ||
+      event.key === 'ArrowDown' ||
+      event.key === 'ArrowLeft' ||
+      event.key === 'ArrowRight'
+    ) {
+
+      navigationKeys.delete(
+        event.key
+      );
+
+      event.preventDefault();
+    }
+  }
+);
+
+
+/* ============================================================
+   KONTINUIERLICHE NAVIGATION
+   ============================================================ */
+
+function navigationLoop(
+  currentTime
+) {
+
+  /*
+     Zeit seit dem letzten Frame.
+
+     Begrenzung verhindert einen riesigen
+     Bewegungssprung, falls der Browser z.B.
+     kurz pausiert wurde.
+  */
+
+  let deltaTime =
+    (
+      currentTime -
+      navigationTime
+    ) / 1000;
+
+
+  deltaTime =
+    Math.min(
+      deltaTime,
+      0.05
+    );
+
+
+  navigationTime =
+    currentTime;
+
+
+  /*
+     Nur bewegen, wenn mindestens
+     eine Pfeiltaste gedrückt ist.
+  */
+
+  if (
+    navigationKeys.size > 0
+  ) {
+
+    navigate(
+      deltaTime
+    );
+  }
+
+
+  requestAnimationFrame(
+    navigationLoop
+  );
+}
+
+
+/* ============================================================
+   NAVIGATION AUSFÜHREN
+   ============================================================ */
+
+function navigate(
+  deltaTime
+) {
+
+  /*
+     CTRL + Pfeiltasten
+
+     ==========================
+     Höhe / Blickrichtung
+     ==========================
+    */
+
+  if (
+    window.navigationModifierCtrl
+  ) {
+
+    if (
+      navigationKeys.has('ArrowUp')
+    ) {
+
+      sliders.h.value =
+        Math.min(
+          MAX_HEIGHT,
+          +sliders.h.value +
+          NAVIGATION.heightSpeed *
+          deltaTime
+        );
+    }
+
+
+    if (
+      navigationKeys.has('ArrowDown')
+    ) {
+
+      sliders.h.value =
+        Math.max(
+          MIN_HEIGHT,
+          +sliders.h.value -
+          NAVIGATION.heightSpeed *
+          deltaTime
+        );
+    }
+
+
+    if (
+      navigationKeys.has('ArrowLeft')
+    ) {
+
+      sliders.d.value =
+        (
+          +sliders.d.value +
+          NAVIGATION.directionSpeed *
+          deltaTime +
+          360
+        ) % 360;
+    }
+
+
+    if (
+      navigationKeys.has('ArrowRight')
+    ) {
+
+      sliders.d.value =
+        (
+          +sliders.d.value -
+          NAVIGATION.directionSpeed *
+          deltaTime
+        ) % 360;
+    }
+
+
+    update();
+
+    return;
+  }
+
+
+  /*
+     MODUS A – KARTE
+
+     Pfeile bewegen direkt auf der Karte.
+    */
+
+  if (
+    navigationMode === 'map'
+  ) {
+
+    const distance =
+      NAVIGATION.positionSpeed *
+      deltaTime;
+
+
+    if (
+      navigationKeys.has('ArrowDown')
+    ) {
+
+      sliders.y.value =
+        Math.min(
+          2,
+          +sliders.y.value +
+          distance
+        );
+    }
+
+
+    if (
+      navigationKeys.has('ArrowUp')
+    ) {
+
+      sliders.y.value =
+        Math.max(
+          -2,
+          +sliders.y.value -
+          distance
+        );
+    }
+
+
+    if (
+      navigationKeys.has('ArrowLeft')
+    ) {
+
+      sliders.x.value =
+        Math.max(
+          -2,
+          +sliders.x.value -
+          distance
+        );
+    }
+
+
+    if (
+      navigationKeys.has('ArrowRight')
+    ) {
+
+      sliders.x.value =
+        Math.min(
+          2,
+          +sliders.x.value +
+          distance
+        );
+    }
+
+
+    update();
+
+    return;
+  }
+
+
+  /*
+     MODUS B – BLICKRICHTUNG
+
+     Links/rechts drehen.
+     Oben/unten vorwärts/rückwärts.
+    */
+
+  if (
+    navigationMode === 'direction'
+  ) {
+
+    const angle =
+      +sliders.d.value *
+      Math.PI /
+      180;
+
+
+    /*
+       Drehung
+    */
+
+    if (
+      navigationKeys.has('ArrowLeft')
+    ) {
+
+      sliders.d.value =
+        (
+          +sliders.d.value +
+          NAVIGATION.directionSpeed *
+          deltaTime +
+          360
+        ) % 360;
+    }
+
+
+    if (
+      navigationKeys.has('ArrowRight')
+    ) {
+
+      sliders.d.value =
+        (
+          +sliders.d.value -
+          NAVIGATION.directionSpeed *
+          deltaTime
+        ) % 360;
+    }
+
+
+    /*
+       Vorwärts / rückwärts.
+
+       0°  = nach unten
+       90° = nach rechts
+       180° = nach oben
+       270° = nach links
+    */
+
+    const dx =
+      Math.sin(angle);
+
+    const dy =
+      Math.cos(angle);
+
+
+    let movement =
+      0;
+
+
+    if (
+      navigationKeys.has('ArrowUp')
+    ) {
+
+      movement +=
+        NAVIGATION.positionSpeed *
+        deltaTime;
+    }
+
+
+    if (
+      navigationKeys.has('ArrowDown')
+    ) {
+
+      movement -=
+        NAVIGATION.positionSpeed *
+        deltaTime;
+    }
+
+
+    if (
+      movement !== 0
+    ) {
+
+      sliders.x.value =
+        Math.max(
+          -2,
+          Math.min(
+            2,
+            +sliders.x.value +
+            dx * movement
+          )
+        );
+
+
+      sliders.y.value =
+        Math.max(
+          -2,
+          Math.min(
+            2,
+            +sliders.y.value +
+            dy * movement
+          )
+        );
+    }
+
+
+    update();
+  }
+}
+
+
+/* ============================================================
+   CTRL-STATUS
+   ============================================================ */
+
+/*
+   Der aktuelle CTRL-Status wird separat verfolgt,
+   damit die kontinuierliche Navigation weiß,
+   ob die Pfeiltasten gerade als Höhen-/Drehsteuerung
+   oder als Positionssteuerung verwendet werden.
+*/
+
+window.navigationModifierCtrl =
+  false;
+
+
+document.addEventListener(
+  'keydown',
+  event => {
+
+    if (
+      event.key === 'Control'
+    ) {
+
+      window.navigationModifierCtrl =
+        true;
+    }
+  }
+);
+
+
+document.addEventListener(
+  'keyup',
+  event => {
+
+    if (
+      event.key === 'Control'
+    ) {
+
+      window.navigationModifierCtrl =
+        false;
+    }
+  }
+);
+
+
+/*
+   Falls das Fenster den Fokus verliert,
+   alle Tasten sicher freigeben.
+   Dadurch bleibt keine Bewegung hängen.
+*/
+
+window.addEventListener(
+  'blur',
+  () => {
+
+    navigationKeys.clear();
+
+    window.navigationModifierCtrl =
+      false;
+  }
+);
+
+
+/* ============================================================
+   START
+   ============================================================ */
+
+requestAnimationFrame(
+  navigationLoop
+);
+
+
+/* ============================================================
+   INITIALISIERUNG
+   ============================================================ */
+
+createCompassSegments();
+
+setDefaultView();
+
+update();
+</script>
+
+</body>
+</html>
+
