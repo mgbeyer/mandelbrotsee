@@ -512,25 +512,58 @@ $$
 x^2+y^2>400.
 $$
 
-Der aktuelle Renderer verwendet also tatsächlich die Summe der Beträge als Escape-Kriterium:
+Der aktuelle Renderer verwendet stattdessen die Summe der Beträge als Escape-Kriterium:
 
 $$
 |x|+|y|>400.
 $$
 
-Der Schwellenwert `400` ist damit sehr groß und entspricht einer Radiusprüfung von 20. Das ist deutlich größer als der übliche mathematische Escape-Radius von 2 beim klassischen Mandelbrot-Set.
+und beschreibt im x/y-Koordinatensystem eine Raute (Manhattan-Distanz) und keinen Kreis.
 
-## Warum der Escape-Radius 20 wichtig ist
+klassische Betragsprüfung:
 
-Ein kleinerer Radius, beispielsweise:
+```text
+        y
+        ↑
+      ╱───╲
+    ╱       ╲
+   │    ●    │     x² + y² > R²
+    ╲       ╱
+      ╲───╱
+        └────→ x
+
+
+Burning-Ship-artig / Betrags-Summe:
+
+        y
+        ↑
+        /\
+       /  \
+      /    \
+     <  ●   >      |x| + |y| > R
+      \    /
+       \  /
+        \/
+        └────→ x
+  ```      
+        
+Der Schwellenwert 400 dient als Escape-Grenze für die Summe der Beträge von Real- und Imaginärteil. Überschreitet |x| + |y| diesen Wert, wird die Iteration als divergent betrachtet.
+
+Der Schwellenwert ist damit deutlich größer als der übliche mathematische Escape-Radius von 2 beim klassischen Mandelbrot-Set.
+
+## Warum die Escape-Schwelle 400 wichtig ist
+
+Eine kleinere Schwelle, wie ein klassischer Radius, beispielsweise:
 
 R = 2
 
 würde die Iteration wesentlich früher abbrechen lassen.
 
-Dadurch werden Punkte bereits als Landpunkte klassifiziert, sobald sie den wesentlich kleineren Radius überschreiten.
+Dadurch werden Punkte bereits als Landpunkte klassifiziert, sobald sie die wesentlich kleinere Schwelle überschreiten.
 
-Beispiel:
+Beispiel – zur Veranschaulichung mit einem klassischen Escape-Radius
+
+Die folgende vereinfachte Darstellung bezieht sich nicht auf die konkrete Escape-Bedingung dieses Programms, sondern dient lediglich dazu, den Einfluss einer sehr großen Escape-Grenze anschaulich zu machen. Bei der klassischen Mandelbrot-Menge wird dafür der Betrag |z| mit einem vorgegebenen Radius verglichen.
 
 Escape-Radius 20:
 
@@ -543,7 +576,7 @@ Z = 0.45
     ↑
     Punkt entkommt relativ spät
 
-Ein vergleichbarer Punkt könnte bei einem Radius von 2 dagegen bereits wesentlich früher entkommen:
+Ein vergleichbarer Punkt könnte bei einem deutlich kleineren Radius von 2 dagegen bereits wesentlich früher entkommen:
 
 Escape-Radius 2:
 
@@ -557,52 +590,27 @@ Z = 1.65
 
 Da "Z" als Höhe verwendet wird, erhält der zweite Punkt eine wesentlich größere Höhe.
 
+Das Beispiel soll lediglich verdeutlichen: Je größer die Escape-Grenze gewählt wird, desto länger kann eine Iteration laufen, bevor sie als entkommen betrachtet wird.
+
+Die tatsächliche Escape-Bedingung des hier untersuchten historischen Programms ist davon zu unterscheiden.
+
 
 ## Auswirkung auf die Grenze zwischen Wasser und Land
 
 Das ist besonders wichtig.
 
-Betrachtet man benachbarte Punkte nahe einer Wasser-/Landgrenze:
+Betrachtet man benachbarte Punkte nahe einer Wasser-/Landgrenze, kann der Escape-Radius beeinflussen, wie stark sich die Höhenwerte unterscheiden.
 
-WASSER | LAND
-       ↑
-     Grenze
+Mit einer großen Escape-Schwelle wie 400 bekommt das System mehr Raum, um Unterschiede in der Fluchtdauer auszunutzen. Die Landschaft kann dadurch vergleichsweise sanft aus dem Wasser heraus ansteigen.
 
-dann kann der Escape-Radius beeinflussen, wie stark sich die Höhenwerte unterscheiden.
-
-Mit einem großen Radius wie 20 bekommt das System mehr Raum, um Unterschiede in der Fluchtdauer auszunutzen. Die Landschaft kann dadurch vergleichsweise sanft aus dem Wasser heraus ansteigen.
-
-Bei einem deutlich kleineren Radius kann die Klassifizierung früher erfolgen. Dadurch entstehen leichter größere Höhenunterschiede zwischen benachbarten Punkten. Das Gelände wird dadurch tendentiell:
+Bei einer deutlich kleineren Escape-Schwelle kann die Klassifizierung früher erfolgen. Dadurch entstehen leichter größere Höhenunterschiede zwischen benachbarten Punkten. Das Gelände wird dadurch tendentiell:
 
 - schroffer
 - zerklüfteter
 - stärker von einzelnen Spitzen geprägt
 - weniger „hügelig“ und stärker „gebirgig“
 
-
-## Der Radius 20 ist deshalb vermutlich eine grafische Entscheidung
-
-Der Wert
-
-X2! + Y2! > 400
-
-ist nicht zwingend deshalb 20, weil 20 mathematisch die korrekte Escape-Grenze wäre.
-
-Für eine Landschaftsdarstellung ist vielmehr interessant:
-
-«Wie lange kann ich einen Punkt iterieren, bevor ich aus seiner Fluchtdauer eine Höhe ableite?»
-
-Der Radius 20 wirkt deshalb wie ein künstlich großer Messbereich, der eine feinere Abstufung der Fluchtdauer ermöglicht.
-
-Der Algorithmus fragt also nicht nur:
-
-Gehört der Punkt zum Fraktal?
-
-sondern sinngemäß:
-
-Wie lange bleibt der Punkt in der Dynamik?
-→ daraus ergibt sich seine Höhe.
-
+Die Escape-Schwelle 400 ist deshalb eine grafische Entscheidung.
 
 ## Zusammenhang mit dem gewünschten Landschaftseffekt
 

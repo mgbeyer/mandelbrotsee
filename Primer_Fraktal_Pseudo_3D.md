@@ -182,7 +182,7 @@ Die Variablen `xa` und `ya` entsprechen dabei den beiden Komponenten des aktuell
 
 ---
 
-## 5. Der Fluchttest
+### 5. Der Fluchttest
 
 Bei Fraktalen wird normalerweise geprüft, ob die Iteration „entkommt“.
 
@@ -192,37 +192,37 @@ Im Code geschieht das hier:
 x2 + y2 > 400
 ```
 
-Da `x2` und `y2` die Beträge der beiden Komponenten sind, entspricht das mathematisch
+Dabei stehen `x2` und `y2` in dieser Variante bereits für die Beträge der beiden Komponenten. Die Bedingung entspricht daher mathematisch:
 
 $$
-|x|^2+|y|^2>400
+|x|+|y|>400
 $$
 
-und damit
+Die Zahl `400` ist somit **keine Radiusangabe**. Sie bezeichnet die Escape-Schwelle der verwendeten Betragssumme.
+
+Zum Vergleich: Bei der klassischen Mandelbrot-Menge wird häufig der Betrag der komplexen Zahl selbst betrachtet:
 
 $$
-|z|^2>400
+|z|=\sqrt{x^2+y^2}
 $$
 
-beziehungsweise
+und eine typische Escape-Bedingung lautet:
 
 $$
-|z|>20
+|z|>2.
 $$
 
-Der verwendete Fluchtradius beträgt also `20`.
+Das ist geometrisch eine Kreisgrenze. Die im historischen Programm verwendete Bedingung
 
-Das ist deutlich größer als der klassische Mandelbrot-Fluchtradius von `2`.
+$$
+|x|+|y|>400
+$$
 
-Der größere Radius verändert nicht grundsätzlich das Prinzip der Berechnung, sondern bestimmt, wann ein Punkt als endgültig „entkommen“ gilt.
+folgt dagegen einer anderen Geometrie und sollte deshalb nicht als „Escape-Radius 20“ bezeichnet werden.
 
-Er ist besonders wichtig für die Auswirkung auf die Grenze zwischen Wasser und Land.
+Die ungewöhnlich hohe Escape-Schwelle bedeutet, dass die Iteration wesentlich länger laufen kann, bevor ein Punkt als entkommen gilt. Dadurch können sich auch Unterschiede in der Fluchtdauer über einen größeren Bereich der Iteration entwickeln.
 
-Betrachtet man benachbarte Punkte nahe einer Wasser-/Landgrenze, dann kann der Escape-Radius beeinflussen, wie stark sich die Höhenwerte unterscheiden.
-
-Mit einem großen Radius wie 20 bekommt das System mehr Raum, um Unterschiede in der Fluchtdauer auszunutzen. Die Landschaft kann dadurch vergleichsweise sanft aus dem Wasser heraus ansteigen.
-
-Bei einem deutlich kleineren Radius kann die Klassifizierung früher erfolgen. Dadurch entstehen leichter größere Höhenunterschiede zwischen benachbarten Punkten. Das Gelände wird dadurch tendenziell schroffer.
+Für die Darstellung als Landschaft ist das relevant: Die Fluchtdauer wird anschließend in einen Höhenwert übersetzt. Die konkrete Form der Höhenverteilung hängt dabei allerdings nicht allein von der Escape-Schwelle ab, sondern auch davon, wie die Fluchtdauer im weiteren Programm verarbeitet und auf die Landschaftshöhe abgebildet wird.
 
 ---
 
