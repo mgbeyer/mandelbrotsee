@@ -982,7 +982,23 @@ $$
 e = \frac{E}{v} \cdot 10 = \frac{10E}{v}
 $$
 
-Dabei ist `v` der aktuelle Renderdurchlauf.
+Dabei ist `v` der aktuelle Renderdurchlauf und beschreibt dabei die Position entlang der Blickrichtung – von der Kamera hinaus in Richtung Landschaft. Es ist jedoch keine reale Entfernung, sondern ein mathematischer Perspektivparameter des jeweiligen Renderdurchlaufs.
+
+```text
+                 Kamera
+                    ●
+                   /|\      v: 1, ←---- e ----→
+                  / | \
+                 /  |  \
+                /   |   \
+               /    |    \
+              /     |     \     v: 300, ←-- e --→
+             /      |      \
+            /       |       \
+           /        |        \
+          /         |         \     v: 600, ← e →
+         ─────────────────────── Landschaft
+```
 
 Das bedeutet:
 
@@ -992,9 +1008,9 @@ v\uparrow
 e\downarrow.
 $$
 
-Je weiter wir in der Rendering-Schleife nach hinten gehen, desto kleiner wird die Schrittweite.
+Je weiter v entlang der Blickrichtung anwächst, desto kleiner wird e.
 
-Die Kamera tastet also die Landschaft mit einer perspektivischen Skalierung ab.
+Die Kamera tastet also die Landschaft mit einer perspektivischen Skalierung ab. Das ist genau der perspektivische Effekt: nahe Bereiche werden mit größeren Schritten abgetastet, entfernte Bereiche mit kleineren.
 
 ---
 
