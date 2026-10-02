@@ -1,5 +1,7 @@
 # Fraktalsee: Eine fantastische Reise - Vom Fraktal zur C64-Landschaft
 
+Eine moderne HTML/Canvas-Portierung eines Programms zur Darstellung fraktaler Landschaften, das ursprünglich 1987 als Commodore-64-BASIC-Listing in der Zeitschrift "Happy Computer" veröffentlicht wurde.
+
 ## Primer: Vom Code zur Mathematik 
 
 [Primer_Code_To_Math](Primer_Code_To_Math.md)
