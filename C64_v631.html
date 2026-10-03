@@ -650,7 +650,8 @@ const MAX_HEIGHT = 10;
 
 const RENDER_CONFIG = {
   viewWidthScale: 0.0093,		// horizontale Breite des Sichtfelds, Größerer Wert → breiteres Sichtfeld, Kleinerer Wert → engeres Sichtfeld / stärkere Vergrößerung
-  iterationHeightChange: 0.05	// Höhenveränderung pro Iteration, Größerer Wert → stärkeres Absteigen, Kleinerer Wert → schwächeres Absteigen
+  iterationHeightChange: 0.05,	// Höhenveränderung pro Iteration, Größerer Wert → stärkeres Absteigen, Kleinerer Wert → schwächeres Absteigen
+  iterationEscapeThreshold: 400		// Abbruchbedingung für Iterationen, Größerer Wert → mehr Iterationen, Kleinerer Wert → weniger Iterationen
 };
 
 
@@ -754,7 +755,7 @@ function iterate(xc, yc) {
 
     if (
       z < 0 ||
-      x2 + y2 > 400
+      x2 + y2 > RENDER_CONFIG.iterationEscapeThreshold
     ) {
       return { z };
     }
