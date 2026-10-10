@@ -4,7 +4,7 @@ Eine moderne HTML-/Canvas-Portierung eines Programms zur Darstellung fraktaler L
 
 Das Programm erzeugt eine pseudo-3D-Landschaft mit einem See, basierend auf einem Mandelbrot-artigen Iterationsverfahren. Knapp vier Jahrzehnte später lässt sich diese Landschaft direkt im Webbrowser erkunden – ganz ohne C64, Joystick oder Supercomputer.
 
-<img src="screenshots/scr01.jpg" alt="Der Mandelsee" width="50%">
+<img src="screenshots/scr01.jpg" alt="Der Mandelsee" width="75%">
 
 ## Ein Stück Computergeschichte
 
@@ -30,14 +30,16 @@ Moderne KI-Werkzeuge können bei diesem Reverse Engineering helfen. Sie unterst�
 
 Ein wesentlicher Bestandteil dieses Projekts ist deshalb nicht nur, das alte Programm neu zum Laufen zu bringen, sondern auch zu verstehen, wie es funktioniert, und die dahinterliegende Mathematik nachvollziehbar zu erklären.
 
-<img src="screenshots/scr02a.jpg" alt="Der Mandelsee" width="33%">
-<img src="screenshots/scr02b.jpg" alt="Der Mandelsee" width="33%">
-
 ## Die moderne Portierung
 
 Das ursprüngliche BASIC-Programm wurde mit JavaScript und HTML Canvas neu umgesetzt. Der Browser übernimmt die grafische Darstellung und macht die Landschaft auf modernen Systemen zugänglich – ganz ohne die ursprüngliche Hardware.
 
 Das Ziel ist dabei sowohl praktisch als auch explorativ: ein faszinierendes Stück Heimcomputer-Geschichte zu bewahren, seine mathematischen Grundlagen zu untersuchen und das Ergebnis allen zugänglich zu machen, die sich für Fraktale, Algorithmen und die kreative Ingenieurskunst der frühen Heimcomputer-Ära interessieren.
+
+|                                                                    |                                                                    |
+|--------------------------------------------------------------------|--------------------------------------------------------------------|
+| <img src="screenshots/scr02a.jpg" alt="Der Mandelsee" width="50%"> | <img src="screenshots/scr02b.jpg" alt="Der Mandelsee" width="50%"> |
+
 
 ## Die beiden Primer
 
