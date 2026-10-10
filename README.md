@@ -36,9 +36,9 @@ Das ursprüngliche BASIC-Programm wurde mit JavaScript und HTML Canvas neu umges
 
 Das Ziel ist dabei sowohl praktisch als auch explorativ: ein faszinierendes Stück Heimcomputer-Geschichte zu bewahren, seine mathematischen Grundlagen zu untersuchen und das Ergebnis allen zugänglich zu machen, die sich für Fraktale, Algorithmen und die kreative Ingenieurskunst der frühen Heimcomputer-Ära interessieren.
 
-|                                                                    |                                                                    |
-|--------------------------------------------------------------------|--------------------------------------------------------------------|
-| <img src="screenshots/scr02a.jpg" alt="Der Mandelsee" width="50%"> | <img src="screenshots/scr02b.jpg" alt="Der Mandelsee" width="50%"> |
+|                                                                     |                                                                     |
+|---------------------------------------------------------------------|---------------------------------------------------------------------|
+| <img src="screenshots/scr02a.jpg" alt="Der Mandelsee" width="100%"> | <img src="screenshots/scr02b.jpg" alt="Der Mandelsee" width="100%"> |
 
 
 ## Die beiden Primer
