@@ -4,29 +4,7 @@ Eine moderne HTML-/Canvas-Portierung eines Programms zur Darstellung fraktaler L
 
 Das Programm erzeugt eine pseudo-3D-Landschaft mit einem See, basierend auf einem Mandelbrot-artigen Iterationsverfahren. Knapp vier Jahrzehnte später lässt sich diese Landschaft direkt im Webbrowser erkunden – ganz ohne C64, Joystick oder Supercomputer.
 
-## Die beiden Primer
-
-Dieses Projekt enthält zwei sich ergänzende Primer, die sich dem ursprünglichen Programm aus unterschiedlichen Richtungen nähern.
-
-### 1. Vom Code zur Mathematik
-
-[Primer: Vom Code zur Mathematik](Primer_Code_To_Math.md)
-
-Was bedeutet eine bestimmte Codezeile mathematisch – und warum steht sie dort?
-
-Dieser Primer geht **vom vorhandenen Quellcode rückwärts**: Ausgehend vom ursprünglichen BASIC-Listing und seiner JavaScript-/Canvas-Portierung werden die mathematischen Zusammenhänge rekonstruiert, die sich hinter der zunächst kryptisch wirkenden Implementierung verbergen.
-
-Im Mittelpunkt steht die Frage, wie die einzelnen Berechnungen funktionieren und wie sie zum fertigen Bild beitragen.
-
-### 2. Von der Mandelbrot-artigen Iteration zur pseudo-3D-Fraktallandschaft
-
-[Primer: Von der Mandelbrot-artigen Iteration zur pseudo-3D-Fraktallandschaft](Primer_Fraktal_Pseudo_3D.md)
-
-Dieser Primer geht den umgekehrten Weg. Ausgehend von den mathematischen Grundlagen erklärt er, wie sich ein Mandelbrot-artiges Iterationsverfahren zur Erzeugung einer Landschaft nutzen lässt, die den Eindruck einer dreidimensionalen Welt vermittelt.
-
-Dabei werden die Mathematik des ursprünglichen Programms und ihre Umsetzung in der modernen JavaScript-/Canvas-Portierung miteinander verknüpft.
-
-Eine gewisse Überschneidung zwischen beiden Primern lässt sich nicht vermeiden. Der Primer „Vom Code zur Mathematik“ entstand später, um einige Details des Quellcodes genauer zu untersuchen. Wer an einer Stelle nicht weiterkommt, findet im jeweils anderen Primer möglicherweise eine andere oder ergänzende Erklärung. Reinschauen lohnt sich also! ;-)
+<img src="screenshots/scr01.jpg" alt="Der Mandelsee" width="50%">
 
 ## Ein Stück Computergeschichte
 
@@ -52,8 +30,35 @@ Moderne KI-Werkzeuge können bei diesem Reverse Engineering helfen. Sie unterst�
 
 Ein wesentlicher Bestandteil dieses Projekts ist deshalb nicht nur, das alte Programm neu zum Laufen zu bringen, sondern auch zu verstehen, wie es funktioniert, und die dahinterliegende Mathematik nachvollziehbar zu erklären.
 
+<img src="screenshots/scr02a.jpg" alt="Der Mandelsee" width="33%">
+<img src="screenshots/scr02b.jpg" alt="Der Mandelsee" width="33%">
+
 ## Die moderne Portierung
 
 Das ursprüngliche BASIC-Programm wurde mit JavaScript und HTML Canvas neu umgesetzt. Der Browser übernimmt die grafische Darstellung und macht die Landschaft auf modernen Systemen zugänglich – ganz ohne die ursprüngliche Hardware.
 
 Das Ziel ist dabei sowohl praktisch als auch explorativ: ein faszinierendes Stück Heimcomputer-Geschichte zu bewahren, seine mathematischen Grundlagen zu untersuchen und das Ergebnis allen zugänglich zu machen, die sich für Fraktale, Algorithmen und die kreative Ingenieurskunst der frühen Heimcomputer-Ära interessieren.
+
+## Die beiden Primer
+
+Dieses Projekt enthält zwei sich ergänzende Primer, die sich dem ursprünglichen Programm aus unterschiedlichen Richtungen nähern.
+
+### 1. Vom Code zur Mathematik
+
+[Primer: Vom Code zur Mathematik](Primer_Code_To_Math.md)
+
+Was bedeutet eine bestimmte Codezeile mathematisch – und warum steht sie dort?
+
+Dieser Primer geht **vom vorhandenen Quellcode rückwärts**: Ausgehend vom ursprünglichen BASIC-Listing und seiner JavaScript-/Canvas-Portierung werden die mathematischen Zusammenhänge rekonstruiert, die sich hinter der zunächst kryptisch wirkenden Implementierung verbergen.
+
+Im Mittelpunkt steht die Frage, wie die einzelnen Berechnungen funktionieren und wie sie zum fertigen Bild beitragen.
+
+### 2. Von der Mandelbrot-artigen Iteration zur pseudo-3D-Fraktallandschaft
+
+[Primer: Von der Mandelbrot-artigen Iteration zur pseudo-3D-Fraktallandschaft](Primer_Fraktal_Pseudo_3D.md)
+
+Dieser Primer geht den umgekehrten Weg. Ausgehend von den mathematischen Grundlagen erklärt er, wie sich ein Mandelbrot-artiges Iterationsverfahren zur Erzeugung einer Landschaft nutzen lässt, die den Eindruck einer dreidimensionalen Welt vermittelt.
+
+Dabei werden die Mathematik des ursprünglichen Programms und ihre Umsetzung in der modernen JavaScript-/Canvas-Portierung miteinander verknüpft.
+
+Eine gewisse Überschneidung zwischen beiden Primern lässt sich nicht vermeiden. Der Primer „Vom Code zur Mathematik“ entstand später, um einige Details des Quellcodes genauer zu untersuchen. Wer an einer Stelle nicht weiterkommt, findet im jeweils anderen Primer möglicherweise eine andere oder ergänzende Erklärung. Reinschauen lohnt sich also! ;-)
